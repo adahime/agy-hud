@@ -3,14 +3,14 @@
 <img src="docs/assets/banner.svg" alt="AGY-HUD バナー" width="100%" />
 
 <p>
-  <strong>Google Antigravity 向けリアルタイム Token/s・TTFT・生モデル ID・コンテキストウィンドウ HUD</strong>
+  <strong>Google Antigravity 向けのリアルタイム生成速度・TTFT・モデル ID・コンテキスト使用量モニター</strong>
 </p>
 
 <p>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square" alt="ライセンス: MIT" /></a>
   <img src="https://img.shields.io/badge/Python-3.9%2B%20Stdlib-3b82f6?style=flat-square" alt="Python 3.9+ 標準ライブラリ" />
   <img src="https://img.shields.io/badge/Node.js-Built--in%20SQLite-06b6d4?style=flat-square" alt="Node.js 組み込み SQLite" />
-  <img src="https://img.shields.io/badge/Dependencies-Zero-10b981?style=flat-square" alt="依存関係ゼロ" />
+  <img src="https://img.shields.io/badge/Dependencies-Zero-10b981?style=flat-square" alt="外部依存なし" />
   <img src="https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-6366f1?style=flat-square" alt="EN / 中文" />
   <img src="https://img.shields.io/badge/Docs-8%20Languages-ec4899?style=flat-square" alt="8言語ドキュメント" />
 </p>
@@ -28,8 +28,8 @@
 
 <p>
   <a href="#overview">概要</a> ·
-  <a href="#quick-start">クイックスタート</a> ·
-  <a href="#protobuf-map">Protobuf マップ</a> ·
+  <a href="#quick-start">使い方</a> ·
+  <a href="#protobuf-map">データ項目</a> ·
   <a href="CHANGELOG.md">変更履歴</a>
 </p>
 
@@ -38,30 +38,30 @@
 ---
 
 <div align="center">
-  <img src="docs/assets/hud-showcase.svg" alt="AGY-HUD デスクトップピルとネイティブサイドペインのプレビュー" width="100%" />
+  <img src="docs/assets/hud-showcase.svg" alt="AGY-HUD デスクトップウィンドウとサイドパネルのプレビュー" width="100%" />
 </div>
 
 ---
 
-## <a id="overview"></a>AGY-HUD とは？
+## <a id="overview"></a>概要
 
-多くのトークン計測ツールは API 通信をプロキシしたり、クライアント側のトークナイザでサイズを推定したりします。**AGY-HUD** は Google Antigravity のローカル SQLite + WAL 会話データベースを厳格な読み取り専用モード（`?mode=ro`）で直接参照し、ディスク上のワイヤ形式 protobuf `gen_metadata` および `steps` レコードをデコードします。
+**AGY-HUD** は、Google Antigravity 向けの軽量なデスクトップ常駐モニター、CLI ツール、およびサイドパネルプラグインです。ローカルの SQLite 会話データベースを読み取り専用モード（`?mode=ro`）で直接参照し、API プロキシや通信傍受を行わずに、生成速度、初回トークンまでの待ち時間（`TTFT`）、使用中のモデル ID、コンテキスト使用量を表示します。
 
-| 主な機能 | 詳細 |
-| :--- | :--- |
-| **デュアル TPS 計測** | 純粋なストリーミング速度（`GEN TPS = output / stream_sec`）と、初回トークン遅延を含む体感エンドツーエンド速度（`E2E TPS = output / (ttft + stream_sec)`）を同時に計測します。 |
-| **バッファバースト保護** | ミリ秒単位の単一パケット送信（`BUF < 500ms`）を自動検知してフラグ付けし、`100,000+ tok/s` のような擬似スパイクが `PEAK TPS` やグラフを歪めるのを防ぎます。 |
-| **生モデル ID の優先取得** | protobuf の `f19` フィールド（例：`GEMINI-3.8-FLASH-K`）と実際のコンテキスト上限 `f9.f10.f4`（例：`256,000`）を優先的に読み取ります。 |
-| **外部依存ゼロ** | デスクトップフローティングピルと CLI は Python 標準ライブラリ（`sqlite3`、`tkinter`）のみで動作し、サイドペインプラグインは Node.js 組み込みの `node:sqlite` を使用します。 |
-| **EN / 中文 ライブ切替 UI** | デフォルトはコンパクトな英語略称（`GEN`、`E2E`、`STR`、`BUF`、`TTFT`、`THK`、`OUT`、`CTX`）を採用し、`EN / 中文` の即時切り替えにも対応しています。 |
+### 主な特徴
+
+- **ローカルデータの読み取り専用アクセス**：`~/.gemini/antigravity/conversations/<uuid>.db` を読み取り専用（`?mode=ro`）で開きます。API キーの登録やプロキシ設定は不要です。
+- **生成速度と全体速度の計測**：初回トークン出力後のストリーミング速度（`GEN TPS = 出力トークン数 / ストリーム時間`）と、`TTFT` を含めたエンドツーエンド速度（`E2E TPS = 出力トークン数 / (TTFT + ストリーム時間)`）の両方を表示します。500 ミリ秒未満の短時間バッファ応答には `BUF` ラベルを付け、最大速度の統計が偏らないようにしています。
+- **モデル名とコンテキスト上限の正確な取得**：記録内のモデル識別子 `f19`（例：`gemini-3.8-flash-k`）およびコンテキストウィンドウ上限 `f9.f10.f4`（例：`256,000`）をそのまま読み取ります。
+- **外部パッケージ不要**：デスクトップウィンドウと CLI は Python 標準ライブラリ（`sqlite3`、`tkinter`）のみで動作し、サイドパネルプラグインは Node.js 組み込みの `node:sqlite` を利用します。`pip install` や `npm install` は不要です。
+- **英語・中国語の UI 切り替え**：既定では短い英語略称（`GEN`、`E2E`、`STR`、`BUF`、`TTFT`、`THK`、`OUT`、`CTX`）で表示し、右クリックメニューやパネル上部のボタンからいつでも中国語表示へ切り替えられます。
 
 ---
 
-## <a id="quick-start"></a>クイックスタート
+## <a id="quick-start"></a>使い方
 
-### 1. Antigravity 2.0 ネイティブ・サイドペインプラグイン
+### 1. Antigravity 2.0 サイドパネルプラグイン
 
-`~/.gemini/config/plugins/agy-hud` にインストールされ、ライト／ダークテーマ自動連動、TPS 棒グラフ、呼び出しログを備えた補助サイドペインとして動作します：
+`~/.gemini/config/plugins/agy-hud` にインストールすると、ライト／ダークテーマに対応したサイドパネル上で TPS グラフと直近の履歴を確認できます：
 
 ```bash
 python plugin/install_plugin.py
@@ -73,60 +73,60 @@ python plugin/install_plugin.py
 python plugin/install_plugin.py --uninstall
 ```
 
-### 2. スタンドアロン・デスクトップピル & CLI
+### 2. スタンドアロン・デスクトップウィンドウ & CLI
 
-Antigravity のプラグイン設定を一切変更せず、完全に独立して実行できます：
+Antigravity の既存プラグイン設定を変更せず、単体で動作します：
 
-- **Windows GUI（コンソール非表示）**：`desktop/launch.bat` または `desktop/launch.pyw` をダブルクリック
+- **Windows デスクトップ（コマンド画面なしで起動）**：`desktop/launch.bat` または `desktop/launch.pyw` をダブルクリック
 - **Python GUI / CLI**：
 
 ```bash
-# フローティング HUD ピルを起動（デフォルト：EN、500ms 更新）
+# デスクトップ常駐ウィンドウを起動（既定：英語表示、500ms 間隔で更新）
 python -m desktop.cli
 
-# ターミナルへ 1 回スナップショット出力
+# ターミナルに現在の状態を 1 回だけ出力
 python -m desktop.cli --cli
 
-# ターミナルでリアルタイム監視
+# ターミナル上で継続的に更新表示
 python -m desktop.cli --watch
 ```
 
 > [!TIP]
-> フローティングピル上の任意の場所を**右クリック**すると、**言語（`EN` / `中文`）**、**最前面固定（Always on Top）**、**位置固定**、**不透明度（`100%`–`50%`）**、**更新間隔（`0.5s`–`5s`）** を切り替えられます。
+> 常駐ウィンドウ上の任意の場所を**右クリック**すると、**表示言語（`EN` / `中文`）**、**最前面表示**、**位置固定**、**透明度（`100%`–`50%`）**、**更新間隔（`0.5s`–`5s`）**を変更できます。
 
 ---
 
-## <a id="protobuf-map"></a>Protobuf テレメトリマップ
+## <a id="protobuf-map"></a>データ項目
 
-AGY-HUD は `~/.gemini/antigravity/conversations/<uuid>.db` から一次生成メトリクスを抽出します：
+AGY-HUD は `~/.gemini/antigravity/conversations/<uuid>.db` から以下の生成データを取得します：
 
-| フィールドパス | 抽出メトリクス | フォールバック |
+| フィールドパス | 取得項目 | フォールバック |
 | :--- | :--- | :--- |
-| `gen_metadata.f1.f19` | 生の検出モデル識別子（`gemini-3.8-flash-k`） | `f1.f21` 表示名 |
-| `gen_metadata.f1.f4` | `f5` キャッシュ、`f2` 新規入力、`f3` 出力、`f9` 思考、`f10` 可視出力 | `f1.f17.f2` レガシー集計 |
-| `gen_metadata.f1.f9.f10` | `f1` 有効コンテキスト量、`f4` ウィンドウ上限（`256,000`） | モデル別上限テーブル |
-| `gen_metadata.f1.f11` / `f12` | `TTFT` およびストリーミング生成 `Duration` | `0.0s` |
-| `steps`（最新の非終了ステップ） | 実行中プランナーステップ（`step_type = 15`）の経過時間 | アイドル状態 |
+| `gen_metadata.f1.f19` | 検出されたモデル ID（`gemini-3.8-flash-k`） | 表示名（`f1.f21`） |
+| `gen_metadata.f1.f4` | キャッシュ（`f5`）、新規入力（`f2`）、出力（`f3`）、思考（`f9`）、本文出力（`f10`） | 旧形式カウント（`f1.f17.f2`） |
+| `gen_metadata.f1.f9.f10` | 現在のコンテキスト使用量（`f1`）と上限（`f4`、例：`256,000`） | モデル別上限テーブル |
+| `gen_metadata.f1.f11` / `f12` | `TTFT` およびストリーミング生成時間 | `0.0s` |
+| `steps`（実行中の最新行） | 実行中ステップ（`step_type = 15`）の経過時間 | 待機状態 |
 
 ---
 
-## リポジトリ構成
+## ディレクトリ構成
 
 ```text
 agy-hud/
-├── desktop/                     # 依存関係ゼロの Python デスクトップピル & CLI
-│   ├── telemetry.py             # 読み取り専用 SQLite+WAL & protobuf デコーダ
-│   ├── hud_pill.py              # フレームレス Tkinter ピル & EN/中文カード UI
+├── desktop/                     # Python 標準ライブラリのみで動く常駐ウィンドウ & CLI
+│   ├── telemetry.py             # 読み取り専用 SQLite + WAL・protobuf パーサー
+│   ├── hud_pill.py              # Tkinter 常駐ウィンドウと詳細カード UI
 │   ├── cli.py                   # GUI / --cli / --watch エントリポイント
-│   ├── launch.pyw               # Windows サイレント GUI ランチャー
-│   └── launch.bat               # Windows ダブルクリック用ランチャー
-├── plugin/                      # Antigravity 2.0 ネイティブサイドペイン UI プラグイン
-│   ├── plugin.json              # Antigravity プラグインマニフェスト
-│   ├── install_plugin.py        # ワンコマンドインストーラ／アンインストーラ
-│   ├── assets/logo.svg          # ベクターダイヤルアイコン
-│   └── sidecars/hud_panel/      # node:sqlite バックエンド & Webview ダッシュボード
+│   ├── launch.pyw               # Windows バックグラウンド起動スクリプト
+│   └── launch.bat               # Windows 用起動バッチファイル
+├── plugin/                      # Antigravity 2.0 サイドパネルプラグイン
+│   ├── plugin.json              # プラグイン定義ファイル
+│   ├── install_plugin.py        # インストール／アンインストール用スクリプト
+│   ├── assets/logo.svg          # プラグインアイコン
+│   └── sidecars/hud_panel/      # node:sqlite バックエンドと画面 UI
 ├── docs/
-│   └── assets/                  # SVG バナー & UI プレビュー画像
+│   └── assets/                  # バナーとプレビュー用の SVG 画像
 ├── pyproject.toml
 ├── CHANGELOG.md
 └── LICENSE

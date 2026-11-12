@@ -3,7 +3,7 @@
 <img src="docs/assets/banner.svg" alt="AGY-HUD Banner" width="100%" />
 
 <p>
-  <strong>Real-Time Token/s, TTFT, Raw Model ID &amp; Context Window HUD for Google Antigravity</strong>
+  <strong>Real-time token speed, TTFT, active model, and context window monitor for Google Antigravity</strong>
 </p>
 
 <p>
@@ -29,7 +29,7 @@
 <p>
   <a href="#overview">Overview</a> ·
   <a href="#quick-start">Quick Start</a> ·
-  <a href="#protobuf-map">Protobuf Map</a> ·
+  <a href="#protobuf-map">Data Fields</a> ·
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
@@ -38,30 +38,30 @@
 ---
 
 <div align="center">
-  <img src="docs/assets/hud-showcase.svg" alt="AGY-HUD Desktop Pill and Native Side-Pane Preview" width="100%" />
+  <img src="docs/assets/hud-showcase.svg" alt="AGY-HUD Desktop Pill and Side-Pane Preview" width="100%" />
 </div>
 
 ---
 
-## <a id="overview"></a>Why AGY-HUD?
+## <a id="overview"></a>Overview
 
-Most token counters proxy your API traffic or estimate token sizes with client-side tokenizers. **AGY-HUD** reads Google Antigravity's local SQLite + WAL conversation databases directly in strict read-only mode (`?mode=ro`) and decodes the wire-format protobuf `gen_metadata` and `steps` records stored on disk.
+**AGY-HUD** is a lightweight desktop floating monitor, CLI tool, and side-pane plugin for Google Antigravity. It reads local SQLite conversation databases directly in read-only mode (`?mode=ro`) to display token generation speed, time to first token (`TTFT`), active model ID, and context window usage without proxying network traffic.
 
-| Capability | Details |
-| :--- | :--- |
-| **Dual TPS Metrics** | Measures both pure streaming throughput (`GEN TPS = output / stream_sec`) and perceived end-to-end speed (`E2E TPS = output / (ttft + stream_sec)`). |
-| **Buffered Burst Guard** | Automatically flags single-packet millisecond tool flushes (`BUF < 500ms`) so artificial `100,000+ tok/s` spikes never distort `PEAK TPS` or charts. |
-| **Raw Model ID Priority** | Reads protobuf field `f19` directly (e.g. `GEMINI-3.8-FLASH-K`) alongside the real context window budget `f9.f10.f4` (e.g. `256,000`). |
-| **Zero Dependencies** | Desktop floating pill & CLI rely exclusively on Python stdlib (`sqlite3`, `tkinter`); the Antigravity side-pane plugin uses Node's built-in `node:sqlite`. |
-| **Live EN / 中文 UI Toggle** | Defaults to compact technical English abbreviations (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`), with instant `EN / 中文` switching. |
+### Key Features
+
+- **Read-Only Local Data**: Reads `~/.gemini/antigravity/conversations/<uuid>.db` in read-only mode (`?mode=ro`). No API keys or proxy setup required.
+- **Generation & End-to-End Speed**: Tracks both pure streaming speed (`GEN TPS = output / stream_sec`) and overall end-to-end speed including initial latency (`E2E TPS = output / (ttft + stream_sec)`). Responses delivered in under 500 ms are labeled as buffered (`BUF`) so brief bursts do not distort peak speed statistics.
+- **Accurate Model & Context Limit**: Reads the detected model identifier from `f19` (such as `gemini-3.8-flash-k`) and the reported context window limit (`f9.f10.f4`, such as `256,000`).
+- **Zero External Dependencies**: The desktop window and CLI run purely on Python's standard library (`sqlite3`, `tkinter`), while the side-pane plugin uses Node.js built-in `node:sqlite`. No `pip install` or `npm install` needed.
+- **English & Chinese Interface**: Displays compact English abbreviations (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`) by default, and supports switching between English and Chinese (`EN / 中文`).
 
 ---
 
 ## <a id="quick-start"></a>Quick Start
 
-### 1. Native Antigravity 2.0 Side-Pane Plugin
+### 1. Antigravity 2.0 Side-Pane Plugin
 
-Installs into `~/.gemini/config/plugins/agy-hud` as an auxiliary side-pane view with adaptive light/dark theme sync, TPS bar chart, and call log:
+Install the plugin into `~/.gemini/config/plugins/agy-hud` to view live charts and recent turn logs in the Antigravity side pane (automatically adapts to light and dark themes):
 
 ```bash
 python plugin/install_plugin.py
@@ -73,60 +73,60 @@ To uninstall:
 python plugin/install_plugin.py --uninstall
 ```
 
-### 2. Standalone Desktop Floating Pill & CLI
+### 2. Standalone Desktop Window & CLI
 
-Runs completely independently without modifying Antigravity plugins:
+Runs independently without modifying any Antigravity plugin settings:
 
-- **Windows GUI (no console window)**: double-click `desktop/launch.bat` or `desktop/launch.pyw`
+- **Windows Desktop (without console window)**: double-click `desktop/launch.bat` or `desktop/launch.pyw`
 - **Python GUI / CLI**:
 
 ```bash
-# Floating HUD pill (default: EN, 500ms refresh)
+# Launch floating desktop window (default: English, 500ms refresh)
 python -m desktop.cli
 
-# Single-shot terminal snapshot
+# Print a single snapshot in the terminal
 python -m desktop.cli --cli
 
-# Streaming terminal watch
+# Continuously update in the terminal
 python -m desktop.cli --watch
 ```
 
 > [!TIP]
-> Right-click anywhere on the floating pill to toggle **Language (`EN` / `中文`)**, **Always on Top**, **Pin Position**, **Opacity (`100%`–`50%`)**, or **Refresh Rate (`0.5s`–`5s`)**.
+> Right-click anywhere on the floating window to change **Language (`EN` / `中文`)**, **Always on Top**, **Pin Position**, **Opacity (`100%`–`50%`)**, or **Refresh Rate (`0.5s`–`5s`)**.
 
 ---
 
-## <a id="protobuf-map"></a>Protobuf Telemetry Map
+## <a id="protobuf-map"></a>Data Fields
 
-AGY-HUD extracts ground-truth generation fields from `~/.gemini/antigravity/conversations/<uuid>.db`:
+AGY-HUD reads conversation telemetry from `~/.gemini/antigravity/conversations/<uuid>.db`:
 
-| Field Path | Extracted Metric | Fallback |
+| Field Path | Metric | Fallback |
 | :--- | :--- | :--- |
-| `gen_metadata.f1.f19` | Raw detected model identifier (`gemini-3.8-flash-k`) | `f1.f21` display name |
-| `gen_metadata.f1.f4` | `f5` cached, `f2` new input, `f3` output, `f9` thinking, `f10` visible | `f1.f17.f2` legacy usage |
-| `gen_metadata.f1.f9.f10` | `f1` active context size, `f4` window limit (`256,000`) | Model limit lookup table |
-| `gen_metadata.f1.f11` / `f12` | `TTFT` and streaming generation `Duration` | `0.0s` |
-| `steps` (latest non-terminal) | Active planner step (`step_type = 15`) live elapsed counter | Idle state |
+| `gen_metadata.f1.f19` | Detected model identifier (`gemini-3.8-flash-k`) | Display name (`f1.f21`) |
+| `gen_metadata.f1.f4` | Cached (`f5`), new input (`f2`), output (`f3`), thinking (`f9`), visible (`f10`) | Legacy counts (`f1.f17.f2`) |
+| `gen_metadata.f1.f9.f10` | Active context size (`f1`) and window limit (`f4`, e.g. `256,000`) | Model limit lookup table |
+| `gen_metadata.f1.f11` / `f12` | Time to first token (`TTFT`) and streaming duration | `0.0s` |
+| `steps` (latest active row) | Elapsed time of running generation step (`step_type = 15`) | Idle state |
 
 ---
 
-## Repository Structure
+## Project Structure
 
 ```text
 agy-hud/
-├── desktop/                     # Zero-dependency Python Desktop Pill & CLI
-│   ├── telemetry.py             # Read-only SQLite+WAL & protobuf decoder
-│   ├── hud_pill.py              # Frameless Tkinter pill & EN/中文 card UI
-│   ├── cli.py                   # GUI / --cli / --watch entrypoint
-│   ├── launch.pyw               # Silent Windows GUI launcher
-│   └── launch.bat               # Double-click Windows launcher
-├── plugin/                      # Native Antigravity 2.0 Side-Pane UI Plugin
-│   ├── plugin.json              # Antigravity plugin manifest
-│   ├── install_plugin.py        # One-command installer / uninstaller
-│   ├── assets/logo.svg          # Vector dial emblem
-│   └── sidecars/hud_panel/      # node:sqlite backend & Webview dashboard
+├── desktop/                     # Python desktop floating window & CLI
+│   ├── telemetry.py             # Read-only SQLite + WAL and protobuf parser
+│   ├── hud_pill.py              # Tkinter floating capsule & detail card UI
+│   ├── cli.py                   # Entrypoint for GUI / --cli / --watch
+│   ├── launch.pyw               # Background Windows GUI launcher
+│   └── launch.bat               # Windows batch launcher
+├── plugin/                      # Antigravity 2.0 side-pane plugin
+│   ├── plugin.json              # Plugin manifest
+│   ├── install_plugin.py        # Installer / uninstaller script
+│   ├── assets/logo.svg          # Plugin icon
+│   └── sidecars/hud_panel/      # node:sqlite backend and Webview UI
 ├── docs/
-│   └── assets/                  # SVG banner & UI preview graphics
+│   └── assets/                  # SVG banner and preview graphics
 ├── pyproject.toml
 ├── CHANGELOG.md
 └── LICENSE
