@@ -1,0 +1,6 @@
+{
+  "name": "hud_panel",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AGY-HUD side-pane telemetry backend"
+}

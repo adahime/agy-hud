@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AGY-HUD</title>
+  <script src="/preload.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="title-row">
+        <div class="title-group">
+          <h1 class="title" data-i18n="title">AGY-HUD</h1>
+          <span id="status-badge" class="badge idle">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="status-text" data-i18n="connecting">SYNC...</span>
+          </span>
+        </div>
+        <div class="controls-right">
+          <button id="lang-btn" class="lang-btn" type="button" title="Switch EN / 中文">EN / 中</button>
+          <select id="conv-select" class="select" aria-label="Conversation">
+            <option value="auto" data-i18n="optAuto">Auto Pane</option>
+            <option value="latest" data-i18n="optLatest">Latest DB</option>
+          </select>
+        </div>
+      </div>
+      <div id="model-line" class="subtitle" data-i18n="waitingModel">Waiting for telemetry...</div>
+    </header>
+
+    <main class="content">
+      <section class="hero-grid">
+        <div class="card hero">
+          <div class="card-label">
+            <span data-i18n="genLabel">GEN TPS</span>
+            <span id="live-pill" class="micro-pill hidden" data-i18n="livePill">GEN</span>
+          </div>
+          <div class="hero-value">
+            <span id="gen-tps" class="num">--</span>
+            <span class="unit">tok/s</span>
+          </div>
+          <div id="gen-sub" class="card-sub">OUT -- · GEN --</div>
+        </div>
+
+        <div class="card hero">
+          <div class="card-label" data-i18n="e2eLabel">E2E TPS (w/ TTFT)</div>
+          <div class="hero-value">
+            <span id="e2e-tps" class="num">--</span>
+            <span class="unit">tok/s</span>
+          </div>
+          <div id="e2e-sub" class="card-sub">TTFT -- · TOT --</div>
+        </div>
+      </section>
+
+      <section class="card context-card">
+        <div class="context-head">
+          <span class="card-label" data-i18n="ctxLabel">CTX WINDOW</span>
+          <span id="ctx-text" class="mono-sm">-- / -- (0.0%)</span>
+        </div>
+        <div class="progress-track">
+          <div id="ctx-bar" class="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="breakdown-row">
+          <span><span data-i18n="kCache">CACHE</span> <strong id="tok-cache" class="mono-sm">--</strong></span>
+          <span><span data-i18n="kIn">IN</span> <strong id="tok-input" class="mono-sm">--</strong></span>
+          <span><span data-i18n="kThk">THK</span> <strong id="tok-think" class="mono-sm">--</strong></span>
+          <span><span data-i18n="kOut">OUT</span> <strong id="tok-vis" class="mono-sm">--</strong></span>
+        </div>
+      </section>
+
+      <section class="stats-strip">
+        <div class="stat-cell">
+          <span class="stat-k" data-i18n="avgGen">AVG GEN</span>
+          <span id="avg-gen" class="stat-v mono-sm">--</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-k" data-i18n="avgE2e">AVG E2E</span>
+          <span id="avg-e2e" class="stat-v mono-sm">--</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-k" data-i18n="peakTps">PEAK TPS</span>
+          <span id="peak-tps" class="stat-v mono-sm">--</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-k" data-i18n="totOut">TOT OUT</span>
+          <span id="total-out" class="stat-v mono-sm">--</span>
+        </div>
+      </section>
+
+      <section class="card chart-card">
+        <div class="section-head">
+          <span class="card-label" data-i18n="chartTitle">TPS TREND (GEN)</span>
+          <span id="chart-meta" class="mono-xs">0 calls</span>
+        </div>
+        <div id="chart-wrap" class="chart-wrap">
+          <div class="empty-inline" data-i18n="noCalls">No calls yet</div>
+        </div>
+      </section>
+
+      <section class="card history-card">
+        <div class="section-head">
+          <span class="card-label" data-i18n="histTitle">CALL LOG</span>
+          <span class="mono-xs" data-i18n="histHint">Hover for full row</span>
+        </div>
+        <div id="history-list" class="history-list">
+          <div class="empty-inline" data-i18n="waitStep">Waiting for next step...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

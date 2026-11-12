@@ -1,0 +1,15 @@
+# AGY-HUD Antigravity 2.0 Plugin
+
+Auxiliary side-pane UI plugin providing real-time Token/s, TTFT, raw model identifier, context window breakdown, and recent TPS bar chart.
+
+## Install
+
+```bash
+python plugin/install_plugin.py
+```
+
+Restart or reload Antigravity plugins if the side-pane icon does not appear immediately. To remove:
+
+```bash
+python plugin/install_plugin.py --uninstall
+```

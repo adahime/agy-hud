@@ -1,0 +1,12 @@
+{
+  "name": "agy-hud",
+  "displayName": "AGY-HUD",
+  "version": "1.0.0",
+  "description": "Real-time Token/s (GEN & E2E), TTFT, raw model ID, output split, and context window HUD for Google Antigravity.",
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Open the AGY-HUD panel",
+    "Check the current turn's GEN TPS, E2E TPS, and TTFT",
+    "Inspect recent token/s trend and context usage"
+  ]
+}

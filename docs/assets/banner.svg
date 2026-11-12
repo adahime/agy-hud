@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="220" viewBox="0 0 920 220" role="img" aria-label="AGY-HUD Banner">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b101b"/>
+      <stop offset="55%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="16%" cy="50%" r="42%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowGreen" cx="85%" cy="22%" r="36%">
+      <stop offset="0%" stop-color="#22c55e" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arcGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="60%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="920" height="220" rx="16" fill="url(#bgGrad)" stroke="#263143" stroke-width="1.5"/>
+  <rect width="920" height="220" rx="16" fill="url(#glowCyan)"/>
+  <rect width="920" height="220" rx="16" fill="url(#glowGreen)"/>
+
+  <!-- Subtle grid accent -->
+  <g stroke="#1e293b" stroke-width="1" opacity="0.5">
+    <line x1="0" y1="55" x2="920" y2="55"/>
+    <line x1="0" y1="165" x2="920" y2="165"/>
+    <line x1="185" y1="0" x2="185" y2="220"/>
+  </g>
+
+  <!-- Gauge emblem -->
+  <g transform="translate(106, 118)">
+    <circle cx="0" cy="-6" r="56" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+    <path d="M -40 18 A 46 46 0 1 1 40 18" fill="none" stroke="#1e293b" stroke-width="7" stroke-linecap="round"/>
+    <path d="M -40 18 A 46 46 0 1 1 31 -32" fill="none" stroke="url(#arcGrad)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M -25 8 A 30 30 0 0 1 25 8" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="3 4"/>
+    <line x1="0" y1="-4" x2="26" y2="-28" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="0" cy="-4" r="5.5" fill="#f8fafc"/>
+    <text x="0" y="29" text-anchor="middle" font-family="ui-monospace, Consolas, monospace" font-size="11" font-weight="700" fill="#94a3b8" letter-spacing="1.2">TOK/S</text>
+  </g>
+
+  <!-- Title & badges -->
+  <text x="212" y="88" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="40" font-weight="800" fill="#f8fafc" letter-spacing="1.5">AGY-HUD</text>
+
+  <rect x="418" y="61" width="66" height="24" rx="12" fill="#172554" stroke="#3b82f6" stroke-width="1"/>
+  <text x="451" y="77" text-anchor="middle" font-family="ui-monospace, Consolas, monospace" font-size="12" font-weight="700" fill="#93c5fd">v1.0.0</text>
+
+  <text x="214" y="122" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" fill="#94a3b8">
+    Real-Time Token/s, TTFT, Raw Model ID &amp; Context Window HUD for Google Antigravity
+  </text>
+
+  <!-- Feature pills -->
+  <g font-family="ui-monospace, Consolas, monospace" font-size="11.5" font-weight="600">
+    <rect x="212" y="148" width="132" height="28" rx="6" fill="#052e16" stroke="#16a34a" stroke-width="1"/>
+    <text x="278" y="166" text-anchor="middle" fill="#4ade80">GEN &amp; E2E TPS</text>
+
+    <rect x="354" y="148" width="152" height="28" rx="6" fill="#0c1e35" stroke="#0284c7" stroke-width="1"/>
+    <text x="430" y="166" text-anchor="middle" fill="#38bdf8">RAW f19 MODEL ID</text>
+
+    <rect x="516" y="148" width="144" height="28" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+    <text x="588" y="166" text-anchor="middle" fill="#a5b4fc">ZERO EXTERNAL DEPS</text>
+
+    <rect x="670" y="148" width="148" height="28" rx="6" fill="#18181b" stroke="#52525b" stroke-width="1"/>
+    <text x="744" y="166" text-anchor="middle" fill="#e4e4e7">EN / 中文 TOGGLE</text>
+  </g>
+</svg>
