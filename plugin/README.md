@@ -1,6 +1,6 @@
 # AGY-HUD Antigravity 2.0 Plugin
 
-Auxiliary side-pane UI plugin providing real-time Token/s, TTFT, raw model identifier, context window breakdown, and recent TPS bar chart.
+Auxiliary side-pane UI plugin displaying real-time Token/s, TTFT, actual routed model ID (`f19`), context window usage, and recent TPS bar chart.
 
 ## Install
 

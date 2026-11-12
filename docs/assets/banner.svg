@@ -49,7 +49,7 @@
   <text x="451" y="77" text-anchor="middle" font-family="ui-monospace, Consolas, monospace" font-size="12" font-weight="700" fill="#93c5fd">v1.0.0</text>
 
   <text x="214" y="122" font-family="Segoe UI, system-ui, -apple-system, sans-serif" font-size="16" font-weight="500" fill="#94a3b8">
-    Real-Time Token/s, TTFT, Raw Model ID &amp; Context Window HUD for Google Antigravity
+    Real-Time Token/s, TTFT, Routed Model ID &amp; Context Window HUD for Google Antigravity
   </text>
 
   <!-- Feature pills -->
@@ -58,7 +58,7 @@
     <text x="278" y="166" text-anchor="middle" fill="#4ade80">GEN &amp; E2E TPS</text>
 
     <rect x="354" y="148" width="152" height="28" rx="6" fill="#0c1e35" stroke="#0284c7" stroke-width="1"/>
-    <text x="430" y="166" text-anchor="middle" fill="#38bdf8">RAW f19 MODEL ID</text>
+    <text x="430" y="166" text-anchor="middle" fill="#38bdf8">ROUTED f19 ID</text>
 
     <rect x="516" y="148" width="144" height="28" rx="6" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
     <text x="588" y="166" text-anchor="middle" fill="#a5b4fc">ZERO EXTERNAL DEPS</text>

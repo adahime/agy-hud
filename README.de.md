@@ -3,14 +3,14 @@
 <img src="docs/assets/banner.svg" alt="AGY-HUD Banner" width="100%" />
 
 <p>
-  <strong>Echtzeit-Monitor für Token-Geschwindigkeit, TTFT, aktives Modell und Kontextauslastung in Google Antigravity</strong>
+  <strong>Echtzeit-Monitor für Token-Geschwindigkeit, TTFT, tatsächliche geroutete Modell-ID und Kontextauslastung in Google Antigravity</strong>
 </p>
 
 <p>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square" alt="Lizenz: MIT" /></a>
   <img src="https://img.shields.io/badge/Python-3.9%2B%20Stdlib-3b82f6?style=flat-square" alt="Python 3.9+ Standardbibliothek" />
-  <img src="https://img.shields.io/badge/Node.js-Built--in%20SQLite-06b6d4?style=flat-square" alt="Node.js integriertes SQLite" />
-  <img src="https://img.shields.io/badge/Dependencies-Zero-10b981?style=flat-square" alt="Keine externen Abhängigkeiten" />
+  <img src="https://img.shields.io/badge/Node.js-22.5%2B%20node%3Asqlite-06b6d4?style=flat-square" alt="Node.js 22.5+ node:sqlite" />
+  <img src="https://img.shields.io/badge/Dependencies-Zero%20External-10b981?style=flat-square" alt="Keine externen Pakete" />
   <img src="https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-6366f1?style=flat-square" alt="EN / 中文" />
   <img src="https://img.shields.io/badge/Docs-8%20Languages-ec4899?style=flat-square" alt="Dokumentation in 8 Sprachen" />
 </p>
@@ -45,15 +45,15 @@
 
 ## <a id="overview"></a>Überblick
 
-**AGY-HUD** ist ein schlanker schwebender Desktop-Monitor, ein CLI-Tool und ein Seitenpanel-Plugin für Google Antigravity. Es liest lokale SQLite-Datenbanken direkt im Nur-Lese-Modus (`?mode=ro`) aus, um Token-Geschwindigkeit, Zeit bis zum ersten Token (`TTFT`), aktives Modell und Kontextauslastung anzuzeigen, ohne den Netzwerkverkehr umzuleiten.
+**AGY-HUD** ist ein schlanker schwebender Desktop-Monitor, ein CLI-Tool und ein Seitenpanel-Plugin für Google Antigravity. Es liest lokale SQLite-Datenbanken (`~/.gemini/antigravity/conversations/<uuid>.db` samt `-wal`) strikt im Nur-Lese-Modus aus und zeigt Token-Geschwindigkeit, Zeit bis zum ersten Token (`TTFT`), die **tatsächlich geroutete Backend-Modell-ID** und die Kontextauslastung ohne Umleitung des Netzwerkverkehrs an.
 
 ### Hauptfunktionen
 
-- **Lokale Daten im Nur-Lese-Modus**: Liest `~/.gemini/antigravity/conversations/<uuid>.db` im Nur-Lese-Modus (`?mode=ro`). Keine API-Schlüssel und keine Proxy-Einrichtung erforderlich.
-- **Generierungs- und Gesamtgeschwindigkeit**: Zeigt sowohl die reine Streaming-Rate nach dem ersten Token (`GEN TPS = Ausgabe / Stream-Dauer`) als auch die Gesamtgeschwindigkeit inklusive Startlatenz (`E2E TPS = Ausgabe / (TTFT + Stream-Dauer)`). Antworten unter 500 ms werden als `BUF` gekennzeichnet, damit kurze Ausbrüche die Maximalwerte nicht verzerren.
-- **Genaue Modell- und Kontexterkennung**: Liest die erkannte Modellkennung direkt aus Feld `f19` (z. B. `gemini-3.8-flash-k`) sowie das gemeldete Kontextlimit aus `f9.f10.f4` (z. B. `256,000`).
-- **Keine externen Abhängigkeiten**: Desktop-Fenster und CLI verwenden ausschließlich die Python-Standardbibliothek (`sqlite3`, `tkinter`), das Seitenpanel-Plugin nutzt das in Node.js integrierte `node:sqlite`. Weder `pip install` noch `npm install` sind nötig.
-- **Englische & chinesische Oberfläche**: Verwendet standardmäßig kompakte englische Abkürzungen (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`) und ermöglicht den Wechsel zwischen Englisch und Chinesisch über das Kontextmenü oder die Panel-Kopfzeile.
+- **Tatsächlich geroutete Modell-ID zuerst**: Priorisiert das Protobuf-Feld `f19`—die tatsächlich im Backend angesteuerte Modellkennung (z. B. `gemini-3.8-flash-k`)—statt des Anzeigenamens in der Oberfläche (`f21`, der nur als Fallback dient, wenn `f19` fehlt). Liest zudem das gemeldete Kontextlimit direkt aus `f9.f10.f4` (z. B. `256,000`).
+- **Generierungs- und Gesamtgeschwindigkeit**: Berechnet sowohl die reine Streaming-Rate nach dem ersten Token (`GEN TPS = Ausgabe / Stream-Dauer`) als auch die Gesamtrate inklusive Startlatenz (`E2E TPS = Ausgabe / (TTFT + Stream-Dauer)`). Antworten unter `0.5s` (oder unter `1.0s` bei über `1,200 tok/s`) werden als `BUF` markiert, aus `PEAK TPS` ausgeschlossen und stattdessen über `E2E` sowie die letzte anhaltende Streaming-Rate (`STR`) dargestellt.
+- **Lokaler Nur-Lese-Zugriff**: Desktop-Fenster und CLI in Python öffnen Datenbanken per SQLite-URI `?mode=ro` und überwachen Änderungszeiten von `.db` und `.db-wal`; das Seitenpanel-Plugin nutzt Node.js `node:sqlite` mit `{ readOnly: true }`. Weder API-Schlüssel noch Proxy-Konfiguration nötig.
+- **Keine externen Pakete**: Desktop-Fenster und CLI nutzen ausschließlich die Python-3.9+-Standardbibliothek (`sqlite3`, `tkinter`), während das Seitenpanel-Plugin das in Antigravity enthaltene `sidecar_sdk` und Node.js 22.5+ `node:sqlite` verwendet. Kein `pip install` oder `npm install` erforderlich.
+- **Desktop-Fenster, CLI & Seitenpanel-Plugin**: Das Seitenpanel passt sich automatisch an helle und dunkle Designs an, erlaubt den Wechsel zwischen `Auto Pane`, `Latest DB` oder den 15 zuletzt aktiven Konversationen und zeigt ein Balkendiagramm der letzten 28 Aufrufe sowie eine Historie über 30 Einträge. Beide Oberflächen nutzen standardmäßig knappe englische Kürzel (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`) und unterstützen die Umschaltung zwischen `EN` und `中文`.
 
 ---
 
@@ -61,7 +61,7 @@
 
 ### 1. Antigravity 2.0 Seitenpanel-Plugin
 
-Installiert das Plugin in `~/.gemini/config/plugins/agy-hud`, um TPS-Diagramme und aktuelle Einträge direkt im Seitenpanel anzuzeigen (passt sich automatisch an helle und dunkle Designs an):
+Installiert das Plugin in `~/.gemini/config/plugins/agy-hud` (falls das Symbol nicht sofort erscheint, Antigravity neu laden oder neu starten):
 
 ```bash
 python plugin/install_plugin.py
@@ -77,36 +77,39 @@ python plugin/install_plugin.py --uninstall
 
 Läuft unabhängig, ohne bestehende Antigravity-Plugin-Einstellungen zu verändern:
 
-- **Windows-Desktop (ohne Konsolenfenster)**: Doppelklick auf `desktop/launch.bat` oder `desktop/launch.pyw`
+- **Windows (ohne Konsolenfenster)**: Doppelklick auf `desktop/launch.bat` oder `desktop/launch.pyw`
 - **Python GUI / CLI**:
 
 ```bash
-# Schwebendes Desktop-Fenster starten (Standard: Englisch, 500 ms Aktualisierung)
+# Schwebendes Desktop-Fenster starten (Standard: EN, 500 ms Aktualisierung, 92 % Deckkraft)
 python -m desktop.cli
 
-# Einzelnen Status im Terminal ausgeben
+# Optionale Parameter: --lang en|zh, --refresh-ms 500, --alpha 0.92
+python -m desktop.cli --lang zh --refresh-ms 1000
+
+# Einzelnen Status im Terminal ausgeben und beenden
 python -m desktop.cli --cli
 
-# Fortlaufend im Terminal aktualisieren
-python -m desktop.cli --watch
+# Bei jeder abgeschlossenen Antwort eine Zeile ausgeben (--interval Standard: 1.0 s)
+python -m desktop.cli --watch --interval 1.0
 ```
 
 > [!TIP]
-> Ein **Rechtsklick** an beliebiger Stelle im schwebenden Fenster öffnet die Einstellungen für **Sprache (`EN` / `中文`)**, **Immer im Vordergrund**, **Position fixieren**, **Transparenz (`100%`–`50%`)** und **Aktualisierungsrate (`0.5s`–`5s`)**.
+> Die obere Leiste per Linksklick verschieben (sofern nicht fixiert), über `▾` oder Doppelklick auf den Text die Details auf-/zuklappen und per **Rechtsklick** an beliebiger Stelle **Sprache (`EN` / `中文`)**, **Immer im Vordergrund**, **Position fixieren**, **Transparenz (`100%`–`50%`)** oder **Aktualisierungsrate (`0.5s`–`5s`)** einstellen.
 
 ---
 
 ## <a id="protobuf-map"></a>Datenfelder
 
-AGY-HUD liest folgende Felder aus `~/.gemini/antigravity/conversations/<uuid>.db`:
+AGY-HUD liest `gen_metadata` und `steps` aus `~/.gemini/antigravity/conversations/<uuid>.db`:
 
 | Feldpfad | Wert | Fallback |
 | :--- | :--- | :--- |
-| `gen_metadata.f1.f19` | Erkannte Modellkennung (`gemini-3.8-flash-k`) | Anzeigename (`f1.f21`) |
-| `gen_metadata.f1.f4` | Cache (`f5`), neue Eingabe (`f2`), Ausgabe (`f3`), Denken (`f9`), sichtbar (`f10`) | Älteres Zählformat (`f1.f17.f2`) |
-| `gen_metadata.f1.f9.f10` | Aktuelle Kontextnutzung (`f1`) und Limit (`f4`, z. B. `256,000`) | Modell-Limit-Tabelle |
-| `gen_metadata.f1.f11` / `f12` | Zeit bis zum ersten Token (`TTFT`) und Streaming-Dauer | `0.0s` |
-| `steps` (neueste aktive Zeile) | Verstrichene Zeit des laufenden Schritts (`step_type = 15`) | Leerlauf |
+| `gen_metadata.f1.f19` | **Tatsächlich geroutete Backend-Modell-ID** (z. B. `gemini-3.8-flash-k`) | UI-Anzeigename (`f1.f21`) |
+| `gen_metadata.f1.f4` | Cache (`f5`), neue Eingabe (`f2`), Ausgabe (`f3` oder `f1`), Denken (`f9`), sichtbar (`f10`) | Älteres Zählformat (`f1.f17.f2`) |
+| `gen_metadata.f1.f9.f10` | Aktive Kontextgröße (`f1`) und Fensterlimit (`f4`, z. B. `256,000`) | `Cache + neue Eingabe`; Modell-Limit-Tabelle |
+| `gen_metadata.f1.f11` / `f1.f12` | Zeit bis zum ersten Token (`TTFT`, `f11`) und Streaming-Dauer (`f12`) | `0.0s` |
+| `steps` (`status != 3`) | Laufzeit des aktiven Generierungsschritts (`step_type = 15`); im Seitenpanel auch `TOOL`-Anzeige bei anderen aktiven Schritten und Zeitstempel über `f1.f20` | Leerlauf |
 
 ---
 
@@ -114,17 +117,17 @@ AGY-HUD liest folgende Felder aus `~/.gemini/antigravity/conversations/<uuid>.db
 
 ```text
 agy-hud/
-├── desktop/                     # Desktop-Fenster & CLI mit Python-Standardbibliothek
-│   ├── telemetry.py             # Nur-Lese SQLite + WAL und Protobuf-Parser
-│   ├── hud_pill.py              # Schwebendes Tkinter-Fenster & Detailansicht
+├── desktop/                     # Desktop-Fenster & CLI auf Basis von Python 3.9+ Stdlib
+│   ├── telemetry.py             # Nur-Lese SQLite (?mode=ro) + WAL und Protobuf-Parser
+│   ├── hud_pill.py              # Rahmenloses Tkinter-Fenster, Detailkarte & EN/中文 UI
 │   ├── cli.py                   # Einstiegspunkt für GUI / --cli / --watch
-│   ├── launch.pyw               # Hintergrund-Starter für Windows ohne Konsole
+│   ├── launch.pyw               # Stiller Hintergrund-Starter für Windows
 │   └── launch.bat               # Windows-Batch-Starter per Doppelklick
 ├── plugin/                      # Antigravity 2.0 Seitenpanel-Plugin
 │   ├── plugin.json              # Plugin-Manifest
 │   ├── install_plugin.py        # Installations- und Deinstallationsskript
 │   ├── assets/logo.svg          # Plugin-Symbol
-│   └── sidecars/hud_panel/      # node:sqlite Backend und Webview-Oberfläche
+│   └── sidecars/hud_panel/      # node:sqlite Backend (450 ms Abruf, ETag) & Webview-UI
 ├── docs/
 │   └── assets/                  # SVG-Banner und Vorschaubilder
 ├── pyproject.toml
