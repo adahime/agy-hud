@@ -11,13 +11,25 @@
   <img src="https://img.shields.io/badge/Python-3.9%2B%20Stdlib-3b82f6?style=flat-square" alt="Python 3.9+" />
   <img src="https://img.shields.io/badge/Node.js-Built--in%20SQLite-06b6d4?style=flat-square" alt="Node.js Built-in SQLite" />
   <img src="https://img.shields.io/badge/Dependencies-Zero-10b981?style=flat-square" alt="Zero Dependencies" />
-  <img src="https://img.shields.io/badge/UI-EN%20%2F%20中文-6366f1?style=flat-square" alt="EN / 中文" />
+  <img src="https://img.shields.io/badge/UI-EN%20%2F%20%E4%B8%AD%E6%96%87-6366f1?style=flat-square" alt="EN / 中文" />
+  <img src="https://img.shields.io/badge/Docs-8%20Languages-ec4899?style=flat-square" alt="Docs: 8 Languages" />
 </p>
 
 <p>
-  <a href="#english">English</a> ·
-  <a href="#中文说明">中文说明</a> ·
+  <strong>English</strong> ·
+  <a href="README.zh-CN.md">简体中文</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.es.md">Español</a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="README.ru.md">Русский</a>
+</p>
+
+<p>
+  <a href="#overview">Overview</a> ·
   <a href="#quick-start">Quick Start</a> ·
+  <a href="#protobuf-map">Protobuf Map</a> ·
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
@@ -31,17 +43,17 @@
 
 ---
 
-## <a id="english"></a>Why AGY-HUD?
+## <a id="overview"></a>Why AGY-HUD?
 
-Most token counters proxy your API traffic or guess token sizes with client-side tokenizers. **AGY-HUD** reads Google Antigravity's local SQLite + WAL conversation databases directly in strict read-only mode (`?mode=ro`) and decodes the wire-format protobuf `gen_metadata` and `steps` records stored on disk.
+Most token counters proxy your API traffic or estimate token sizes with client-side tokenizers. **AGY-HUD** reads Google Antigravity's local SQLite + WAL conversation databases directly in strict read-only mode (`?mode=ro`) and decodes the wire-format protobuf `gen_metadata` and `steps` records stored on disk.
 
 | Capability | Details |
 | :--- | :--- |
-| **Dual TPS Metrics** | Measures both pure streaming speed (`GEN TPS = output / stream_sec`) and perceived end-to-end speed (`E2E TPS = output / (ttft + stream_sec)`). |
-| **Buffered Burst Guard** | Automatically flags single-packet millisecond tool flushes (`BUF < 500ms`) so false `100,000+ tok/s` artifacts never pollute `PEAK TPS` or charts. |
-| **Raw Model ID Priority** | Reads protobuf field `f19` directly (e.g. `GEMINI-3.8-FLASH-K`) alongside real context budget `f9.f10.f4` (e.g. `256,000`). |
+| **Dual TPS Metrics** | Measures both pure streaming throughput (`GEN TPS = output / stream_sec`) and perceived end-to-end speed (`E2E TPS = output / (ttft + stream_sec)`). |
+| **Buffered Burst Guard** | Automatically flags single-packet millisecond tool flushes (`BUF < 500ms`) so artificial `100,000+ tok/s` spikes never distort `PEAK TPS` or charts. |
+| **Raw Model ID Priority** | Reads protobuf field `f19` directly (e.g. `GEMINI-3.8-FLASH-K`) alongside the real context window budget `f9.f10.f4` (e.g. `256,000`). |
 | **Zero Dependencies** | Desktop floating pill & CLI rely exclusively on Python stdlib (`sqlite3`, `tkinter`); the Antigravity side-pane plugin uses Node's built-in `node:sqlite`. |
-| **EN / 中文 Live Toggle** | Defaults to compact technical English abbreviations (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`), with instant `EN / 中文` switching. |
+| **Live EN / 中文 UI Toggle** | Defaults to compact technical English abbreviations (`GEN`, `E2E`, `STR`, `BUF`, `TTFT`, `THK`, `OUT`, `CTX`), with instant `EN / 中文` switching. |
 
 ---
 
@@ -84,7 +96,7 @@ python -m desktop.cli --watch
 
 ---
 
-## Protobuf Telemetry Map
+## <a id="protobuf-map"></a>Protobuf Telemetry Map
 
 AGY-HUD extracts ground-truth generation fields from `~/.gemini/antigravity/conversations/<uuid>.db`:
 
@@ -122,15 +134,6 @@ agy-hud/
 
 ---
 
-## <a id="中文说明"></a>中文说明
+## License
 
-### 核心特性
-
-- **双口径速度监控**：同时统计纯流式吐字速度（`GEN TPS`）与含首字延迟（`TTFT`）的端到端速度（`E2E TPS`），自动识别毫秒级单包缓冲（`BUF`），防止假尖峰拉歪峰值数据。
-- **优先识别真实底层模型代号**：直接解码 protobuf `f19` 字段（如 `GEMINI-3.8-FLASH-K`）以及底层真实的上下文上限（如 `256,000`）。
-- **零外部依赖 & 只读安全**：桌面悬浮窗与 CLI 仅依赖 Python 标准库，侧边栏插件仅依赖 Node 内置 `node:sqlite`，全程以 `?mode=ro` 只读方式挂载本地数据库与 WAL 日志。
-- **默认纯英文极客缩写 + 随时中英切换**：悬浮窗右键菜单 `Language` 与侧边栏右上角 `EN / 中` 按钮均支持一键切换，且桌面窗默认完全保持简洁英文缩写。
-
-### 许可证
-
-基于 [MIT License](LICENSE) 开源。
+Released under the [MIT License](LICENSE).
